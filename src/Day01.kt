@@ -1,15 +1,36 @@
+import java.util.stream.Collectors
+
 fun main() {
     fun part1(input: List<String>): Int {
-        return input.size
+        return input.stream().map { word ->
+            val digits = word.filter { character -> character.isDigit() }
+            "${digits.first()}${digits.last()}".toInt()
+        }.reduce { acc, elem -> acc+elem}.orElse(0)
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val digitsAsWords = mapOf(
+                "one" to "o1e",
+                "two" to "t2o",
+                "three" to "t3e",
+                "four" to "f4r",
+                "five" to "f5e",
+                "six" to "s6x",
+                "seven" to "s7n",
+                "eight" to "e8t",
+                "nine" to "n9e"
+        )
+
+        fun replaceWordWithDigits(sentence: String): String {
+            return digitsAsWords.entries
+                    .fold(sentence) { acc, elem -> acc.replace(elem.key, elem.value) }
+        }
+
+        return part1(input.map{replaceWordWithDigits(it)})
     }
 
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
+    check(part1(readInput("Day01_test")) == 142)
+    check(part2(readInput("Day01_test2")) == 281)
 
     val input = readInput("Day01")
     part1(input).println()
