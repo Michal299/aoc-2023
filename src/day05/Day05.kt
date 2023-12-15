@@ -3,6 +3,8 @@ package day05
 import println
 import readInput
 import java.util.*
+import java.util.stream.Collectors
+import kotlin.math.min
 
 fun main() {
     fun part1(input: List<String>): Long {
@@ -17,12 +19,27 @@ fun main() {
         } ?: 0
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun part2(input: List<String>): Long {
+        val seedsPairs = input.first().split(":").last().trim().split(" ")
+        val seeds = HashSet<Pair<Long, Long>>()
+        val mappingsInOrder = parseToMappings(input.subList(2, input.size))
+        for (i in seedsPairs.indices step 2) {
+            seeds.add(seedsPairs[i].toLong() to (seedsPairs[i].toLong() + seedsPairs[i + 1].toLong() - 1L))
+        }
+
+        return seeds.parallelStream().map {
+            var minValue = Long.MAX_VALUE
+            for (i in it.first..it.second) {
+                minValue = min(minValue, mappingsInOrder.fold(i) { acc, elem ->
+                    elem.map(acc)
+                })
+            }
+            minValue
+        }.collect(Collectors.toSet()).min()
     }
 
     check(part1(readInput("day05/Day05_test")) == 35L)
-    check(part2(readInput("day05/Day05_test")) == 281)
+    check(part2(readInput("day05/Day05_test")) == 46L)
 
     val input = readInput("day05/Day05")
     part1(input).println()
